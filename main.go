@@ -37,7 +37,7 @@ func main() {
 	rootCmd.Execute()
 }
 
-func historyFile() (string, error) {
+func HistoryFile() (string, error) {
 	home, e := homedir.Dir()
 	if e != nil {
 		return "", e
@@ -47,7 +47,7 @@ func historyFile() (string, error) {
 }
 
 func save() error {
-	historyFileName, e := historyFile()
+	historyFileName, e := HistoryFile()
 	historyFile, e := os.OpenFile(historyFileName, os.O_RDWR|os.O_APPEND, 0600)
 	defer historyFile.Close()
 	if e != nil {
@@ -77,7 +77,7 @@ func save() error {
 }
 
 func show() error {
-	historyFileName, e := historyFile()
+	historyFileName, e := HistoryFile()
 	historyFile, e := os.OpenFile(historyFileName, os.O_RDONLY, 0400)
 	defer historyFile.Close()
 	if e != nil {
