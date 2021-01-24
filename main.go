@@ -12,10 +12,10 @@ import (
 )
 
 func main() {
-	var cmdBk = &cobra.Command{
-		Use:   "bk [directory path]",
+	var cmdSave = &cobra.Command{
+		Use:   "save [directory path]",
 		Short: "bookmark your directory",
-		Long:  "bk is bookmarker for your directory.",
+		Long:  "save is bookmarker for your directory.",
 		Run: func(cmd *cobra.Command, args []string) {
 			// ブックマークの処理実行
 			save()
@@ -33,7 +33,7 @@ func main() {
 	}
 
 	var rootCmd = &cobra.Command{Use: "bk"}
-	rootCmd.AddCommand(cmdBk, cmdShow)
+	rootCmd.AddCommand(cmdSave, cmdShow)
 	rootCmd.Execute()
 }
 
@@ -48,6 +48,8 @@ func HistoryFile() (string, error) {
 
 func save() error {
 	historyFileName, e := HistoryFile()
+	// 第3引数の'0600'はファイルモード。「ll」コマンドで出てくるrwxr-xr-xとかのこと。
+	// ファイルを読み込みできたら書き込みし、できなければファイルを作って書き込む。
 	historyFile, e := os.OpenFile(historyFileName, os.O_RDWR|os.O_APPEND, 0600)
 	defer historyFile.Close()
 	if e != nil {
@@ -60,17 +62,14 @@ func save() error {
 	if e != nil {
 		return e
 	}
-	var isDuplicate = false
 	scanner := bufio.NewScanner(historyFile)
 	for scanner.Scan() {
 		if currentDirName == scanner.Text() {
-			isDuplicate = true
 			fmt.Println("This directory is already bookmarked.")
+			return nil
 		}
 	}
-	if isDuplicate {
-		return nil
-	}
+	// historyFIleに現在のディレクトリを書き込み
 	fmt.Fprintln(historyFile, currentDirName)
 	fmt.Println("Bookmark is successful.")
 	return nil
@@ -95,3 +94,6 @@ func show() error {
 	fmt.Println(texts)
 	return nil
 }
+
+//func delete() error {
+//}
