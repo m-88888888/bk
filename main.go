@@ -2,9 +2,12 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/mitchellh/go-homedir"
@@ -17,7 +20,6 @@ func main() {
 		Short: "bookmark your directory",
 		Long:  "save is bookmarker for your directory.",
 		Run: func(cmd *cobra.Command, args []string) {
-			// ブックマークの処理実行
 			save()
 		},
 	}
@@ -27,16 +29,32 @@ func main() {
 		Short: "show bookmark directory",
 		Long:  "show your bookmarked directory.",
 		Run: func(cmd *cobra.Command, args []string) {
-			// ブックマークの処理実行
 			show()
 		},
 	}
 
+	var cmdDelete = &cobra.Command{
+		Use:   "delete",
+		Short: "delete bookmark directory.",
+		Long:  "delete your bookmark directory from history.",
+		Run: func(cmd *cobra.Command, args []string) {
+			delete()
+		},
+	}
+
+	var cmdJp = &cobra.Command{
+		Use: "jp",
+		Run: func(cmd *cobra.Command, args []string) {
+			jump()
+		},
+	}
+
 	var rootCmd = &cobra.Command{Use: "bk"}
-	rootCmd.AddCommand(cmdSave, cmdShow)
+	rootCmd.AddCommand(cmdSave, cmdShow, cmdDelete, cmdJp)
 	rootCmd.Execute()
 }
 
+// HistoryFile ...
 func HistoryFile() (string, error) {
 	home, e := homedir.Dir()
 	if e != nil {
@@ -95,5 +113,60 @@ func show() error {
 	return nil
 }
 
-//func delete() error {
-//}
+func delete() error {
+	show := exec.Command("bk", "show")
+	peco := exec.Command("peco")
+	// io.Writerとio.Readerをつなげる
+	r, w := io.Pipe()
+	show.Stdout = w
+	// bk showの内容をpecoに渡す
+	peco.Stdin = r
+	var out bytes.Buffer
+	peco.Stdout = &out
+
+	show.Start()
+	peco.Start()
+	show.Wait()
+	w.Close()
+	peco.Wait()
+	// pecoで選択した値をoutで受け取る
+	deletePath := strings.TrimRight(out.String(), "\n")
+
+	historyFileName, e := HistoryFile()
+	historyFile, e := os.OpenFile(historyFileName, os.O_RDONLY, 0600)
+	if e != nil {
+		return e
+	}
+	var texts string
+	scanner := bufio.NewScanner(historyFile)
+	for scanner.Scan() {
+		t := scanner.Text()
+		if deletePath != t {
+			texts = texts + t + "\n"
+		}
+	}
+	historyFile.Close()
+	texts = strings.TrimRight(texts, "\n")
+	if len(texts) == 0 {
+		exec.Command("cp", "/dev/null", historyFileName).Start()
+	} else {
+		historyFileW, e := os.OpenFile(historyFileName, os.O_WRONLY|os.O_TRUNC, 0600)
+		if e != nil {
+			return e
+		}
+		fmt.Fprintln(historyFileW, texts)
+		historyFileW.Close()
+	}
+	return nil
+}
+
+func jump() error {
+	show := exec.Command("bk", "show")
+	peco := exec.Command("peco")
+	r, w := io.Pipe()
+	show.Stdout = w
+	peco.Stdin = r
+	show.Start()
+	peco.Start()
+	return nil
+}
