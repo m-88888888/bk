@@ -42,15 +42,8 @@ func main() {
 		},
 	}
 
-	var cmdJp = &cobra.Command{
-		Use: "jp",
-		Run: func(cmd *cobra.Command, args []string) {
-			jump()
-		},
-	}
-
 	var rootCmd = &cobra.Command{Use: "bk"}
-	rootCmd.AddCommand(cmdSave, cmdShow, cmdDelete, cmdJp)
+	rootCmd.AddCommand(cmdSave, cmdShow, cmdDelete)
 	rootCmd.Execute()
 }
 
@@ -117,7 +110,9 @@ func delete() error {
 	show := exec.Command("bk", "show")
 	peco := exec.Command("peco")
 	// io.Writerとio.Readerをつなげる
+	// bk showの出力内容をpecoにつなげるため？
 	r, w := io.Pipe()
+	// showの標準出力にio.Pipeを渡すことで、pecoの標準入力に値が渡される？
 	show.Stdout = w
 	// bk showの内容をpecoに渡す
 	peco.Stdin = r
@@ -157,16 +152,5 @@ func delete() error {
 		fmt.Fprintln(historyFileW, texts)
 		historyFileW.Close()
 	}
-	return nil
-}
-
-func jump() error {
-	show := exec.Command("bk", "show")
-	peco := exec.Command("peco")
-	r, w := io.Pipe()
-	show.Stdout = w
-	peco.Stdin = r
-	show.Start()
-	peco.Start()
 	return nil
 }
