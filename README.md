@@ -29,6 +29,11 @@ $ bk show
 $ bk delete
 ```
 
+- jump your bookmarked directory
+```sh
+$ jp
+```
+
 ## Uninstall
 
 ```sh
