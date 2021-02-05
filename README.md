@@ -1,3 +1,36 @@
+# bk
+
+bk bookmarks your directory.
+
+## Install
+
 ```sh
-$ cd (go run main.go show | peco)
+$ make build
+$ make install
+```
+
+## Requirements
+- peco
+
+## Usage
+
+- bookmark
+```sh
+$ bk save
+```
+
+- show your bookmarks
+```sh
+$ bk show
+```
+
+- delete your bookmark
+```sh
+$ bk delete
+```
+
+## Uninstall
+
+```sh
+$ make clean
 ```
