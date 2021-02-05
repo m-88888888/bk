@@ -1,2 +1,4 @@
 #!bin/fish
-cd (go run main.go show | peco)
+function jp
+  cd (bk show | peco)
+end
