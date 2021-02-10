@@ -1,5 +1,4 @@
-
-bk: main.go
+build: main.go
 		go build
 install: 
 		cp $(CURDIR)/bk /usr/local/bin/bk
