@@ -24,13 +24,13 @@ func TestSaveFilePath(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 	scanner := bufio.NewScanner(file)
-	result := false
+	pathNotExists := true
 	for scanner.Scan() {
 		if scanner.Text() == testPath {
-			result = true
+			pathNotExists = false
 		}
 	}
-	if !result && len(msg) == 0 {
-		t.Errorf("currentDirName don't contain in historyFile")
+	if pathNotExists || len(msg) == 0 {
+		t.Errorf("%v don't contain in historyFile", testPath)
 	}
 }
