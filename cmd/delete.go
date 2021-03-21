@@ -26,12 +26,8 @@ var deleteCmd = &cobra.Command{
 func delete() error {
 	show := exec.Command("bk", "show")
 	peco := exec.Command("peco")
-	// io.Writerとio.Readerをつなげる
-	// bk showの出力内容をpecoにつなげるため？
 	r, w := io.Pipe()
-	// showの標準出力にio.Pipeを渡すことで、pecoの標準入力に値が渡される？
 	show.Stdout = w
-	// bk showの内容をpecoに渡す
 	peco.Stdin = r
 	var out bytes.Buffer
 	peco.Stdout = &out
@@ -41,13 +37,17 @@ func delete() error {
 	show.Wait()
 	w.Close()
 	peco.Wait()
-	// pecoで選択した値をoutで受け取る
-	deletePath := strings.TrimRight(out.String(), "\n")
 
-	historyFileName, e := util.HistoryFile()
-	historyFile, e := os.OpenFile(historyFileName, os.O_RDONLY, 0600)
-	if e != nil {
-		return e
+	return DeleteFilePath(out.String())
+}
+
+func DeleteFilePath(filePath string) error {
+	deletePath := strings.TrimRight(filePath, "\n")
+
+	historyFileName, err := util.HistoryFile()
+	historyFile, err := os.OpenFile(historyFileName, os.O_RDONLY, 0600)
+	if err != nil {
+		return err
 	}
 	var texts string
 	scanner := bufio.NewScanner(historyFile)
@@ -62,9 +62,9 @@ func delete() error {
 	if len(texts) == 0 {
 		exec.Command("cp", "/dev/null", historyFileName).Start()
 	} else {
-		historyFileW, e := os.OpenFile(historyFileName, os.O_WRONLY|os.O_TRUNC, 0600)
-		if e != nil {
-			return e
+		historyFileW, err := os.OpenFile(historyFileName, os.O_WRONLY|os.O_TRUNC, 0600)
+		if err != nil {
+			return err
 		}
 		fmt.Fprintln(historyFileW, texts)
 		historyFileW.Close()
