@@ -30,11 +30,11 @@ var saveCmd = &cobra.Command{
 	Short: "bookmark your directory",
 	Long:  "save is bookmarker for your directory.",
 	Run: func(cmd *cobra.Command, args []string) {
-		save()
+		Save()
 	},
 }
 
-func save() error {
+func Save() error {
 	historyFileName, e := util.HistoryFile()
 	// 第3引数の'0600'はファイルモード。「ll」コマンドで出てくるrwxr-xr-xとかのこと。
 	// ファイルを読み込みできたら書き込みし、できなければファイルを作って書き込む。
