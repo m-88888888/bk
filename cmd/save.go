@@ -34,33 +34,38 @@ var saveCmd = &cobra.Command{
 	},
 }
 
-func save() error {
-	historyFileName, e := util.HistoryFile()
-	// 第3引数の'0600'はファイルモード。「ll」コマンドで出てくるrwxr-xr-xとかのこと。
-	// ファイルを読み込みできたら書き込みし、できなければファイルを作って書き込む。
-	historyFile, e := os.OpenFile(historyFileName, os.O_RDWR|os.O_APPEND, 0600)
+func save() {
+	currentDirName, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	msg, err := SaveFilePath(currentDirName)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(msg)
+}
+
+func SaveFilePath(filePath string) (string, error) {
+	historyFileName, err := util.HistoryFile()
+	historyFile, err := os.OpenFile(historyFileName, os.O_RDWR|os.O_APPEND, 0600)
 	defer historyFile.Close()
-	if e != nil {
-		historyFile, e = os.OpenFile(historyFileName, os.O_CREATE|os.O_WRONLY, 0600)
-		if e != nil {
-			return e
+	if err != nil {
+		historyFile, err = os.OpenFile(historyFileName, os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			return "", err
 		}
 	}
-	currentDirName, e := os.Getwd()
-	if e != nil {
-		return e
-	}
+
 	scanner := bufio.NewScanner(historyFile)
 	for scanner.Scan() {
-		if currentDirName == scanner.Text() {
-			fmt.Println("This directory is already bookmarked.")
-			return nil
+		if filePath == scanner.Text() {
+			return "This directory is already bookmarked.", nil
 		}
 	}
-	// historyFIleに現在のディレクトリを書き込み
-	fmt.Fprintln(historyFile, currentDirName)
-	fmt.Println("Bookmark is successful.")
-	return nil
+	fmt.Fprintln(historyFile, filePath)
+	return "Bookmark is successful.", nil
 }
 
 func init() {
