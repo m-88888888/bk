@@ -8,3 +8,5 @@ clean:
 		rm /usr/local/bin/bk
 		rm ~/.config/fish/functions/jp.fish
 #		rm /usr/local/bin/jp
+test:
+		go test -v github.com/m-88888888/bk/...
