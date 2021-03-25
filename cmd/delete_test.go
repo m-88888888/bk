@@ -10,7 +10,7 @@ import (
 )
 
 func TestDeleteFilePath(t *testing.T) {
-	testPath := "/Users/username/directory"
+	testPath := "/usr/local/bin"
 	_, err := SaveFilePath(testPath)
 	if err != nil {
 		t.Fatalf("%v", err)
