@@ -1,0 +1,29 @@
+project_name: bk
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - main: .
+    binary: genlink
+    ldflags: -s -w -X main.date={{.Date}}
+archives:
+  - replacements:
+      darwin: darwin
+      linux: linux
+      windows: windows
+      amd64: x86_64
+    files:
+      - LICENSE
+      - CREDITS
+release:
+  prerelease: auto
+brews:
+  - tap:
+      owner: m-88888888
+      name: homebrew-bk
+    folder: Formula
+    homepage: 'https://github.com/m-88888888/bk'
+    description: 'Bookmark your directory'
+    license: "MIT"
