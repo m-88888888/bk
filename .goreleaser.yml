@@ -6,8 +6,11 @@ before:
     - go mod tidy
 builds:
   - main: .
-    binary: genlink
-    ldflags: -s -w -X main.date={{.Date}}
+    binary: bk
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.Revision={{.ShortCommit}}
 archives:
   - replacements:
       darwin: darwin
@@ -15,7 +18,6 @@ archives:
       windows: windows
       amd64: x86_64
     files:
-      - LICENSE
       - CREDITS
 release:
   prerelease: auto
