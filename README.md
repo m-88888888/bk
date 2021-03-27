@@ -5,8 +5,8 @@ bk bookmarks your directory.
 ## Install
 
 ```sh
-$ make build
-$ make install
+$ brew tap m-88888888/bk
+$ brew install bk
 ```
 
 ## Requirements
@@ -32,10 +32,4 @@ $ bk delete
 - jump your bookmarked directory
 ```sh
 $ jp
-```
-
-## Uninstall
-
-```sh
-$ make clean
 ```
