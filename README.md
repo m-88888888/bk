@@ -12,6 +12,18 @@ $ brew install bk
 ## Requirements
 - peco
 
+## Command
+
+### bash or zsh
+```
+cd `bk show | peco`
+```
+
+### fish
+```
+cd (bk show | peco)
+```
+
 ## Usage
 
 - bookmark
