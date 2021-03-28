@@ -9,7 +9,7 @@ import (
 )
 
 func TestSaveFilePath(t *testing.T) {
-	testPath := "/Users/username/dev"
+	testPath := "/usr/local/bin"
 	msg, err := SaveFilePath(testPath)
 	if err != nil {
 		t.Fatalf("%v", err)
